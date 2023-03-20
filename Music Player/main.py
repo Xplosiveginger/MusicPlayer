@@ -43,7 +43,7 @@ def play():
     """play music"""
     song = file_listbox.curselection()
     song_name = file_listbox.get(song)  
-    song_label.config(text = file_listbox.get("anchor"))
+    song_label.config(text = song_name)
     mixer.music.load(directory + "\\" + song_name)
     mixer.music.play()
 
