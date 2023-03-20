@@ -32,11 +32,6 @@ canvas.title("AsteriX")
 canvas.geometry("1280x720")
 canvas.config(bg = 'black')
 
-# Create the browse button and directory label
-browse_button = tk.Button(canvas, text="Browse", command=browse_directory)
-browse_button.pack(pady=10)
-directory_label = tk.Label(canvas, text="No directory selected.")
-directory_label.pack(pady=10)
 
 # Set Image for buttons
 prev_img = tk.PhotoImage(file= 'Icons\prev.png')
@@ -109,6 +104,16 @@ pauseButton.pack(pady = 15, in_ = top, side = 'left')
 
 nextButton = tk.Button(canvas, text = 'Next', image= next_img, bg='black', borderwidth= 0, command=play_next)
 nextButton.pack(pady = 15, in_ = top, side = 'left')
+
+# Create browse button and directory label container
+browse = tk.Frame(canvas, bg = 'black')
+browse.pack(padx = 10, pady = 5, anchor = 'center')
+
+# Create the browse button and directory label
+directory_label = tk.Label(canvas, text="No directory selected.")
+directory_label.pack(padx = 10, pady=10, in_ = browse, side = 'left')
+browse_button = tk.Button(canvas, text="Browse", command=browse_directory)
+browse_button.pack(pady=10, in_ = browse, side = 'left')
 
 # Start Mainloop
 canvas.mainloop()
