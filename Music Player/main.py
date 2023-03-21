@@ -1,7 +1,10 @@
 import tkinter as tk
 from tkinter import filedialog
+import tkinter.ttk as ttk
 import os
+import pygame
 from pygame import mixer
+import time
 
 def browse_directory():
     """Browse for the directory and update the directory label"""
@@ -14,7 +17,7 @@ def browse_directory():
 
 def check_directory(directory):
     """Get a list of audio files in the directory and display them in the listbox widget"""
-    global file_listbox
+    file_listbox
     file_listbox.delete(0, tk.END)  # clear existing contents
     file_list = os.listdir(directory)
     for file_name in file_list:
@@ -24,6 +27,7 @@ def check_directory(directory):
                 file_listbox.insert(tk.END, file_name)
 
 # Initialize Mixer
+volume = 0.5
 mixer.init()
 
 # Create the main window
@@ -39,6 +43,10 @@ play_img = tk.PhotoImage(file= 'Icons\play-alt.png')
 pause_img = tk.PhotoImage(file= 'Icons\pause.png')
 next_img = tk.PhotoImage(file= 'Icons\pnext.png')
 
+"""def setMusicLength():
+    global music_length 
+    music_length = pygame.mixer.Sound(file_listbox.curselection()).get_length()"""
+
 def play():
     """play music"""
     song = file_listbox.curselection()
@@ -46,6 +54,8 @@ def play():
     song_label.config(text = song_name)
     mixer.music.load(directory + "\\" + song_name)
     mixer.music.play()
+    #setMusicLength()
+    #update_progress_bar()
 
 def pause():
     """pause music"""
@@ -55,6 +65,7 @@ def pause():
     else:
         mixer.music.unpause()
         pauseButton['text'] = "Pause"
+    #update_progress_bar()
 
 def play_next():
     """play next song"""
@@ -67,6 +78,8 @@ def play_next():
     file_listbox.select_clear(0, 'end')
     file_listbox.activate(next_song)
     file_listbox.select_set(next_song)
+    #setMusicLength()
+    #update_progress_bar()
 
 def play_prev():
     """play previous song"""
@@ -79,6 +92,20 @@ def play_prev():
     file_listbox.select_clear(0, 'end')
     file_listbox.activate(next_song)
     file_listbox.select_set(next_song)
+    #setMusicLength()
+    #update_progress_bar()
+
+"""def update_progress_bar():
+    # calculate the current position in the music and update the progress bar
+    current_position = pygame.mixer.music.get_pos() / 1000
+    progress = current_position / music_length * 100
+    progress_bar['value'] = progress
+    if progress < 100:
+        canvas.after(100, update_progress_bar)"""
+
+def change_volume(value):
+    volume = float(value)
+    pygame.mixer.music.set_volume(volume)
 
 # Create the file listbox widget
 file_listbox = tk.Listbox(canvas, fg = "cyan", bg = "black", width = 100, font = ('poppins', 14))
@@ -87,6 +114,10 @@ file_listbox.pack(padx = 15, pady = 15)
 # Create song label widget
 song_label = tk.Label(canvas, text = '', bg = 'black', fg = 'yellow', font = ('poppins', 10))
 song_label.pack(pady = 15)
+
+"""# create a progress bar to show the current position in the music
+progress_bar = ttk.Progressbar(canvas, orient=tk.HORIZONTAL, length=200, mode='determinate')
+progress_bar.pack(padx=10, pady=10)"""
 
 # Create button container
 top = tk.Frame(canvas, bg = 'black')
@@ -104,6 +135,14 @@ pauseButton.pack(pady = 15, in_ = top, side = 'left')
 
 nextButton = tk.Button(canvas, text = 'Next', image= next_img, bg='black', borderwidth= 0, command=play_next)
 nextButton.pack(pady = 15, in_ = top, side = 'left')
+
+# create a minimalistic slider widget to adjust the volume
+style = ttk.Style()
+style.theme_use('alt')
+style.configure("TScale", sliderlength=15, thickness=3, background='white', foreground='gray')
+volume_slider = ttk.Scale(canvas, from_=0, to=1, length=100, orient=tk.HORIZONTAL, command=change_volume, style="TScale")
+volume_slider.set(volume)
+volume_slider.pack(fill=tk.X, padx=10, pady=10)
 
 # Create browse button and directory label container
 browse = tk.Frame(canvas, bg = 'black')
