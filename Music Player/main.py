@@ -32,7 +32,7 @@ mixer.init()
 
 # Create the main window
 canvas = tk.Tk()
-canvas.title("AsteriX")
+canvas.title("AsteriX Music Player")
 canvas.geometry("1280x720")
 canvas.config(bg = 'black')
 
@@ -43,19 +43,21 @@ play_img = tk.PhotoImage(file= 'Icons\play-alt.png')
 pause_img = tk.PhotoImage(file= 'Icons\pause.png')
 next_img = tk.PhotoImage(file= 'Icons\pnext.png')
 
-"""def setMusicLength():
-    global music_length 
-    music_length = pygame.mixer.Sound(file_listbox.curselection()).get_length()"""
-
 def play():
     """play music"""
     song = file_listbox.curselection()
     song_name = file_listbox.get(song)  
     song_label.config(text = song_name)
+    setMusicLength(song_name)
+    update_progress_bar()
     mixer.music.load(directory + "\\" + song_name)
     mixer.music.play()
-    #setMusicLength()
-    #update_progress_bar()
+
+def setMusicLength(song_name):
+    global music_length 
+    music = pygame.mixer.Sound(directory + "\\" + song_name)
+    music_length = music.get_length()
+    print(music_length)
 
 def pause():
     """pause music"""
@@ -65,43 +67,45 @@ def pause():
     else:
         mixer.music.unpause()
         pauseButton['text'] = "Pause"
-    #update_progress_bar()
+    update_progress_bar()
 
 def play_next():
     """play next song"""
     song = file_listbox.curselection()
     next_song = song[0] + 1
-    next_song_name = file_listbox.get(next_song)
-    song_label.config(text = next_song_name)
-    mixer.music.load(directory + "\\" + next_song_name)
+    song = next_song
+    song_name = file_listbox.get(next_song)
+    song_label.config(text = song_name)
+    setMusicLength(song_name)
+    update_progress_bar()
+    mixer.music.load(directory + "\\" + song_name)
     mixer.music.play()
     file_listbox.select_clear(0, 'end')
-    file_listbox.activate(next_song)
-    file_listbox.select_set(next_song)
-    #setMusicLength()
-    #update_progress_bar()
+    file_listbox.activate(song)
+    file_listbox.select_set(song)
 
 def play_prev():
     """play previous song"""
     song = file_listbox.curselection()
-    next_song = song[0] - 1
-    next_song_name = file_listbox.get(next_song)
-    song_label.config(text = next_song_name)
-    mixer.music.load(directory + "\\" + next_song_name)
+    prev_song = song[0] - 1
+    song = prev_song
+    song_name = file_listbox.get(prev_song)
+    song_label.config(text = song_name)
+    setMusicLength(song_name)
+    update_progress_bar()
+    mixer.music.load(directory + "\\" + song_name)
     mixer.music.play()
     file_listbox.select_clear(0, 'end')
-    file_listbox.activate(next_song)
-    file_listbox.select_set(next_song)
-    #setMusicLength()
-    #update_progress_bar()
+    file_listbox.activate(song)
+    file_listbox.select_set(song)
 
-"""def update_progress_bar():
+def update_progress_bar():
     # calculate the current position in the music and update the progress bar
     current_position = pygame.mixer.music.get_pos() / 1000
     progress = current_position / music_length * 100
     progress_bar['value'] = progress
     if progress < 100:
-        canvas.after(100, update_progress_bar)"""
+        canvas.after(100, update_progress_bar)
 
 def change_volume(value):
     volume = float(value)
@@ -115,9 +119,9 @@ file_listbox.pack(padx = 15, pady = 15)
 song_label = tk.Label(canvas, text = '', bg = 'black', fg = 'yellow', font = ('poppins', 10))
 song_label.pack(pady = 15)
 
-"""# create a progress bar to show the current position in the music
+# create a progress bar to show the current position in the music
 progress_bar = ttk.Progressbar(canvas, orient=tk.HORIZONTAL, length=200, mode='determinate')
-progress_bar.pack(padx=10, pady=10)"""
+progress_bar.pack(padx=10, pady=10)
 
 # Create button container
 top = tk.Frame(canvas, bg = 'black')
@@ -139,10 +143,10 @@ nextButton.pack(pady = 15, in_ = top, side = 'left')
 # create a minimalistic slider widget to adjust the volume
 style = ttk.Style()
 style.theme_use('alt')
-style.configure("TScale", sliderlength=15, thickness=3, background='white', foreground='gray')
-volume_slider = ttk.Scale(canvas, from_=0, to=1, length=100, orient=tk.HORIZONTAL, command=change_volume, style="TScale")
+style.configure("TScale", sliderlength=15, thickness=3, background='black', foreground='white')
+volume_slider = ttk.Scale(canvas, from_=0, to=1, length=200, orient=tk.HORIZONTAL, command=change_volume, style="TScale")
 volume_slider.set(volume)
-volume_slider.pack(fill=tk.X, padx=10, pady=10)
+volume_slider.pack(padx=10, pady=10)
 
 # Create browse button and directory label container
 browse = tk.Frame(canvas, bg = 'black')
