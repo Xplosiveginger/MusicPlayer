@@ -33,7 +33,7 @@ mixer.init()
 # Create the main window
 canvas = tk.Tk()
 canvas.title("AsteriX Music Player")
-canvas.geometry("1280x720")
+canvas.geometry("720x980")
 canvas.config(bg = 'black')
 
 
