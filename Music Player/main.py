@@ -57,7 +57,6 @@ def setMusicLength(song_name):
     global music_length 
     music = pygame.mixer.Sound(directory + "\\" + song_name)
     music_length = music.get_length()
-    print(music_length)
 
 def pause():
     """pause music"""
