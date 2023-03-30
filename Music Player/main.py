@@ -43,15 +43,27 @@ play_img = tk.PhotoImage(file= 'Icons\play-alt.png')
 pause_img = tk.PhotoImage(file= 'Icons\pause.png')
 next_img = tk.PhotoImage(file= 'Icons\pnext.png')
 
+repeatonce = 1
+
+def repeatMusic():
+    global repeatonce 
+    repeatonce = 1
+    global repeat 
+    repeat = 0
+
 def play():
     """play music"""
     song = file_listbox.curselection()
     song_name = file_listbox.get(song)  
     song_label.config(text = song_name)
     setMusicLength(song_name)
-    update_progress_bar()
     mixer.music.load(directory + "\\" + song_name)
-    mixer.music.play()
+    if(repeatonce == 1):
+        mixer.music.play(-1)
+    else:
+        mixer.music.play()
+    update_progress_bar()
+
 
 def setMusicLength(song_name):
     global music_length 
@@ -105,6 +117,7 @@ def update_progress_bar():
     progress_bar['value'] = progress
     if progress < 100:
         canvas.after(100, update_progress_bar)
+
 
 def change_volume(value):
     volume = float(value)
