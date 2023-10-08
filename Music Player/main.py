@@ -36,6 +36,10 @@ canvas.title("AsteriX Music Player")
 canvas.geometry("720x980")
 canvas.config(bg = 'black')
 
+bg = tk.PhotoImage(file='Images/LofiBG.jpg')
+
+background_Label = tk.Label(canvas, image=bg)
+background_Label.place(x=0, y=0, relwidth=1, relheight=1)
 
 # Set Image for buttons
 prev_img = tk.PhotoImage(file= 'Icons\prev.png')
