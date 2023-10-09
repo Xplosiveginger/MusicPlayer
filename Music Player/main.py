@@ -6,6 +6,8 @@ import pygame
 from pygame import mixer
 import time
 
+paused = False
+
 def browse_directory():
     """Browse for the directory and update the directory label"""
     global directory_label
@@ -33,19 +35,19 @@ mixer.init()
 # Create the main window
 canvas = tk.Tk()
 canvas.title("AsteriX Music Player")
-canvas.geometry("720x980")
+canvas.geometry("1200x673")
 canvas.config(bg = 'black')
 
-bg = tk.PhotoImage(file='Images/LofiBG.jpg')
+bg = tk.PhotoImage(file="X:\Projects\Python\Github\MusicPlayer\Music Player\Images\LofiBG.jpg")
 
 background_Label = tk.Label(canvas, image=bg)
 background_Label.place(x=0, y=0, relwidth=1, relheight=1)
 
 # Set Image for buttons
-prev_img = tk.PhotoImage(file= 'Icons\prev.png')
-play_img = tk.PhotoImage(file= 'Icons\play-alt.png')
-pause_img = tk.PhotoImage(file= 'Icons\pause.png')
-next_img = tk.PhotoImage(file= 'Icons\pnext.png')
+prev_img = tk.PhotoImage(file= 'X:\Projects\Python\Github\MusicPlayer\Music Player\Icons\prev.png')
+play_img = tk.PhotoImage(file= 'X:\Projects\Python\Github\MusicPlayer\Music Player\Icons\play-alt.png')
+pause_img = tk.PhotoImage(file= 'X:\Projects\Python\Github\MusicPlayer\Music Player\Icons\pause.png')
+next_img = tk.PhotoImage(file= 'X:\Projects\Python\Github\MusicPlayer\Music Player\Icons\pnext.png')
 
 repeatonce = 1
 
@@ -57,6 +59,7 @@ def repeatMusic():
 
 def play():
     """play music"""
+    global song
     song = file_listbox.curselection()
     song_name = file_listbox.get(song)  
     song_label.config(text = song_name)
@@ -75,20 +78,35 @@ def setMusicLength(song_name):
     music_length = music.get_length()
 
 def pause():
-    """pause music"""
+    pause = paused
+    #pause music if already playing
     if pauseButton["text"] == "Pause":
         mixer.music.pause()
-        pauseButton["text"] = "play"
+        pauseButton["text"] = "Play"
+        pauseButton.config(image= play_img)
+        pause = True
+    #play music if paused
     else:
-        mixer.music.unpause()
-        pauseButton['text'] = "Pause"
-    update_progress_bar()
+        if pause:
+            mixer.music.unpause()
+            pauseButton['text'] = "Pause"
+            pauseButton.config(image= pause_img)
+            pause = False
+        else:
+            play();
+            pauseButton['text'] = "Pause"
+            pauseButton.config(image= pause_img)
+    if mixer.music.get_busy():
+        update_progress_bar()
+
+    print(pause)
 
 def play_next():
     """play next song"""
-    song = file_listbox.curselection()
+    #song = mixer.music.load(directory + "\\" + song_name)
+    global song
     next_song = song[0] + 1
-    song = next_song
+    song_ = next_song
     song_name = file_listbox.get(next_song)
     song_label.config(text = song_name)
     setMusicLength(song_name)
@@ -96,14 +114,16 @@ def play_next():
     mixer.music.load(directory + "\\" + song_name)
     mixer.music.play()
     file_listbox.select_clear(0, 'end')
-    file_listbox.activate(song)
-    file_listbox.select_set(song)
+    file_listbox.activate(song_)
+    file_listbox.select_set(song_)
+    song = file_listbox.curselection()
 
 def play_prev():
     """play previous song"""
-    song = file_listbox.curselection()
+    #song = mixer.music.load(directory + "\\" + song_name)
+    global song
     prev_song = song[0] - 1
-    song = prev_song
+    song_ = prev_song
     song_name = file_listbox.get(prev_song)
     song_label.config(text = song_name)
     setMusicLength(song_name)
@@ -111,8 +131,9 @@ def play_prev():
     mixer.music.load(directory + "\\" + song_name)
     mixer.music.play()
     file_listbox.select_clear(0, 'end')
-    file_listbox.activate(song)
-    file_listbox.select_set(song)
+    file_listbox.activate(song_)
+    file_listbox.select_set(song_)
+    song = file_listbox.curselection()
 
 def update_progress_bar():
     # calculate the current position in the music and update the progress bar
@@ -140,39 +161,36 @@ progress_bar = ttk.Progressbar(canvas, orient=tk.HORIZONTAL, length=200, mode='d
 progress_bar.pack(padx=10, pady=10)
 
 # Create button container
-top = tk.Frame(canvas, bg = 'black')
+top = tk.Frame(canvas)
 top.pack(padx = 10, pady = 5, anchor = 'center')
 
 # Setup play, pause, playNext, playPrev buttons
-prevButton = tk.Button(canvas, text = 'Prev', image = prev_img, bg='black', borderwidth= 0, command=play_prev)
+prevButton = tk.Button(canvas, text = 'Prev', image = prev_img, borderwidth= 0, command=play_prev)
 prevButton.pack(pady = 15, in_ = top, side = 'left')
 
-playButton = tk.Button(canvas, text = 'Play', image= play_img, bg='black', borderwidth= 0, command=play)
-playButton.pack(pady = 15, in_ = top, side = 'left')
-
-pauseButton = tk.Button(canvas, text = 'Pause', image= pause_img, bg='black', borderwidth=0, command=pause)
+pauseButton = tk.Button(canvas, text = 'Play', image= play_img, borderwidth=0, command=pause)
 pauseButton.pack(pady = 15, in_ = top, side = 'left')
 
-nextButton = tk.Button(canvas, text = 'Next', image= next_img, bg='black', borderwidth= 0, command=play_next)
+nextButton = tk.Button(canvas, text = 'Next', image= next_img, borderwidth= 0, command=play_next)
 nextButton.pack(pady = 15, in_ = top, side = 'left')
 
 # create a minimalistic slider widget to adjust the volume
 style = ttk.Style()
 style.theme_use('alt')
-style.configure("TScale", sliderlength=15, thickness=3, background='black', foreground='white')
+style.configure("TScale", sliderlength=15, thickness=3, background='black', foreground='transparent')
 volume_slider = ttk.Scale(canvas, from_=0, to=1, length=200, orient=tk.HORIZONTAL, command=change_volume, style="TScale")
 volume_slider.set(volume)
 volume_slider.pack(padx=10, pady=10)
 
 # Create browse button and directory label container
-browse = tk.Frame(canvas, bg = 'black')
+browse = tk.Frame(canvas)
 browse.pack(padx = 10, pady = 5, anchor = 'center')
 
 # Create the browse button and directory label
 directory_label = tk.Label(canvas, text="No directory selected.")
 directory_label.pack(padx = 10, pady=10, in_ = browse, side = 'left')
 browse_button = tk.Button(canvas, text="Browse", command=browse_directory)
-browse_button.pack(pady=10, in_ = browse, side = 'left')
+browse_button.pack(padx=10, pady=10, in_ = browse, side = 'left')
 
 # Start Mainloop
 canvas.mainloop()
