@@ -104,14 +104,6 @@ def stop():
     pauseButton.config(image= play_img)
     paused = False
 
-    '''if mixer.music.get_busy():
-        update_progress_bar()
-    else:
-        if paused == False:
-            pauseButton["text"] = "Play"
-            pauseButton.config(image= play_img)
-    print(pause)'''
-
 def play_next():
     """play next song"""
     #song = mixer.music.load(directory + "\\" + song_name)
@@ -145,14 +137,6 @@ def play_prev():
     file_listbox.activate(song_)
     file_listbox.select_set(song_)
     song = file_listbox.curselection()
-
-def update():
-    if(mixer.music.get_busy() == "False" and paused == False):
-        stop()
-
-    print(mixer.music.get_busy())
-
-    canvas.after(1, update)
 
 def update_progress_bar():
     # calculate the current position in the music and update the progress bar
