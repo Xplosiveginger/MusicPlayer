@@ -76,6 +76,7 @@ def setMusicLength(song_name):
     global music_length 
     music = pygame.mixer.Sound(directory + "\\" + song_name)
     music_length = music.get_length()
+    print(music_length)
 
 def pause():
     #pause music if already playing
@@ -88,21 +89,28 @@ def pause():
     elif pauseButton["text"] == "Pause":
         if paused:
             mixer.music.unpause()
-            pauseButton['text'] = "Pause"
             pauseButton.config(image= pause_img)
             paused = False            
         else:
-            mixer.music.pause();
-            pauseButton['text'] = "Pause"
-            pauseButton.config(image= play_img)
-            paused = True
-    if mixer.music.get_busy():
+            if(mixer.music.get_busy() == True):
+                mixer.music.pause();
+                pauseButton.config(image= play_img)
+                paused = True
+            else:
+                stop()
+
+def stop():
+    pauseButton["text"] = "Play"
+    pauseButton.config(image= play_img)
+    paused = False
+
+    '''if mixer.music.get_busy():
         update_progress_bar()
     else:
         if paused == False:
             pauseButton["text"] = "Play"
             pauseButton.config(image= play_img)
-    print(pause)
+    print(pause)'''
 
 def play_next():
     """play next song"""
@@ -138,16 +146,22 @@ def play_prev():
     file_listbox.select_set(song_)
     song = file_listbox.curselection()
 
+def update():
+    if(mixer.music.get_busy() == "False" and paused == False):
+        stop()
+
+    print(mixer.music.get_busy())
+
+    canvas.after(1, update)
+
 def update_progress_bar():
     # calculate the current position in the music and update the progress bar
     current_position = pygame.mixer.music.get_pos() / 1000
     progress = current_position / music_length * 100
     progress_bar['value'] = progress
-    #print(music_length)
-    #print(current_position)
     if progress < 100:
-        canvas.after(100, update_progress_bar)
-    if current_position == music_length:
+        canvas.after(1, update_progress_bar)
+    else:
         play_next()
 
 
@@ -200,4 +214,5 @@ browse_button = tk.Button(canvas, text="Browse", command=browse_directory)
 browse_button.pack(padx=10, pady=10, in_ = browse, side = 'left')
 
 # Start Mainloop
+#update()
 canvas.mainloop()
