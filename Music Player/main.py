@@ -65,10 +65,10 @@ def play():
     song_label.config(text = song_name)
     setMusicLength(song_name)
     mixer.music.load(directory + "\\" + song_name)
-    if(repeatonce == 1):
-        mixer.music.play(-1)
-    else:
-        mixer.music.play()
+    #if(repeatonce == 1):
+        #mixer.music.play(-1)
+    #else:
+    mixer.music.play()
     update_progress_bar()
 
 
@@ -78,27 +78,30 @@ def setMusicLength(song_name):
     music_length = music.get_length()
 
 def pause():
-    pause = paused
     #pause music if already playing
-    if pauseButton["text"] == "Pause":
-        mixer.music.pause()
-        pauseButton["text"] = "Play"
-        pauseButton.config(image= play_img)
-        pause = True
-    #play music if paused
-    else:
-        if pause:
+    global paused
+
+    if pauseButton["text"] == "Play":
+        play()
+        pauseButton["text"] = "Pause"
+        pauseButton.config(image= pause_img)
+    elif pauseButton["text"] == "Pause":
+        if paused:
             mixer.music.unpause()
             pauseButton['text'] = "Pause"
             pauseButton.config(image= pause_img)
-            pause = False
+            paused = False            
         else:
-            play();
+            mixer.music.pause();
             pauseButton['text'] = "Pause"
-            pauseButton.config(image= pause_img)
+            pauseButton.config(image= play_img)
+            paused = True
     if mixer.music.get_busy():
         update_progress_bar()
-
+    else:
+        if paused == False:
+            pauseButton["text"] = "Play"
+            pauseButton.config(image= play_img)
     print(pause)
 
 def play_next():
@@ -140,8 +143,12 @@ def update_progress_bar():
     current_position = pygame.mixer.music.get_pos() / 1000
     progress = current_position / music_length * 100
     progress_bar['value'] = progress
+    #print(music_length)
+    #print(current_position)
     if progress < 100:
         canvas.after(100, update_progress_bar)
+    if current_position == music_length:
+        play_next()
 
 
 def change_volume(value):
